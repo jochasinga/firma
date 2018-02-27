@@ -1,12 +1,11 @@
-open Cryptokit.Hash
+open Cryptokit
 
 type 'a tree =
   | Leaf of 'a
   | Branch of 'a tree * 'a tree
 
 let new_tree gen_kwd =
-  let hash = sha256 () in
-  let hash_str = hash_string hash gen_kwd in
+  let hash_str = hash_string (Hash.sha2 256) gen_kwd in
   Leaf hash_str
 
 let rec fringe : 'a tree -> 'a list = function
