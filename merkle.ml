@@ -19,9 +19,28 @@ let rec new_tree: ('a list -> 'a tree) = fun l ->
   | [] -> empty
   | x :: l' -> insert x (new_tree l')
 
+let is_perfect_power_of a b =
+  if a = 0 || a = 1 || a mod b <> 0 then false
+  else
+  let rec aux a' =
+    if a' = 1 then true
+    else if a' mod b <> 0 then false
+    else aux (a' / b)
+  in aux a
+
+let is_perfect_power_of_two n = is_perfect_power_of n 2
+
+let is_one_lt_perfect_power_of_two n = is_perfect_power_of_two (n + 1)
+
 let node_of_tx tx = if String.length tx > 0 then Node (tx, Leaf, Leaf) else Leaf
 
 let tree_of_txs txs =
+  if not (
+    List.length txs |> is_perfect_power_of_two
+    || List.length txs |> is_one_lt_perfect_power_of_two
+    )
+  then Leaf else
+
   let nodes = List.map node_of_tx txs in
   match nodes with
   | [] -> Leaf

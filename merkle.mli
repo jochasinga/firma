@@ -13,6 +13,9 @@ val peek : string tree -> unit
 val peek_all : string tree -> unit
 val peek_left : string tree -> unit
 val peek_right : string tree -> unit
+val is_perfect_power_of : int -> int -> bool
+val is_perfect_power_of_two : int -> bool
+val is_one_lt_perfect_power_of_two : int -> bool
 (*
 val peek_pair_all : payload tree -> unit
 val print_left_leaves : payload tree -> unit
