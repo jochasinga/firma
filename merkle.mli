@@ -3,7 +3,8 @@ type payload = string * string
 
 val fringe : 'a tree -> 'a list
 val new_tree : 'a list -> 'a tree
-val create_tree_from_list : string tree list -> string tree
+val node_of_tx : string -> string tree
+val tree_of_txs : string list -> string tree
 val new_hashtree : string list -> payload tree
 val insert : 'a -> 'a tree -> 'a tree
 val insert_hashpair : string -> payload tree -> payload tree

@@ -19,64 +19,68 @@ let rec new_tree: ('a list -> 'a tree) = fun l ->
   | [] -> empty
   | x :: l' -> insert x (new_tree l')
 
-let create_tree_from_list nodes =
+let node_of_tx tx = if String.length tx > 0 then Node (tx, Leaf, Leaf) else Leaf
+
+let tree_of_txs txs =
+  let nodes = List.map node_of_tx txs in
   match nodes with
   | [] -> Leaf
   | [x] -> x
   | x::xs ->
-  let empty = Leaf
-  and tries =
-    match nodes with
-    | [] -> 0
-    | x::[] -> 1
-    | x::xs -> (
-      if List.length nodes mod 2 = 0
-      then List.length nodes
-      else List.length nodes + 1 ) / 2 in
-    printf "tries left: %d\n" tries;
+    let empty = Leaf
+    and tries =
+      match nodes with
+      | [] -> 0
+      | [_] | [_; _] -> 1
+      | _ -> 2
+      in
+      (** TODO: Investigate why max tries is 2 to get correct behavior *)
+      (*
+      | x::xs -> (
+        if List.length nodes mod 2 = 0
+        then List.length nodes
+        else List.length nodes + 1 ) / 2 in
+      *)
+      printf "tries left: %d\n" tries;
+
   let rec aux ?(tries=tries) ?(next=[]) tree' nodes' =
     match nodes' with
-    (** This case should never be reached. *)
     | [] -> Leaf
-    | [x] ->
-      (** Merkle root is reached. *)
+    | [x] -> (
+      (** Merkle root *)
       if tries = 0 then x else
-        (** Widow node reached. *)
-        let Node (x_data, _, _) = x in
-        let parent_data = x_data ^ x_data in
-        let parent = Node (parent_data, x, x) in
-        (* let Node (a, _, _) = x in printf "%S\n" a; *)
-        aux ~tries:(tries-1) tree' (next @ [parent])
-
-    (** start of a pass *)
+      (** Widow node *)
+        match x with
+        | Leaf -> tree'
+        | Node (x_data, _, _) ->
+          let parent_data = x_data ^ x_data in
+          let parent = Node (parent_data, x, x) in
+          aux ~tries:(tries-1) tree' (next @ [parent])
+      )
+    (** Ongoing *)
     | a :: b :: rest -> (
-      (*
-      let Node (a_dat, _, _), Node (b_dat, _, _) = a, b in
-      printf "%S, %S\n" a_dat b_dat;
-      *)
+      printf "tries: %d\n" tries;
       match a, b with
-      | Leaf, Leaf -> empty
+      | Leaf, Leaf ->
+        print_string "Leaf, Leaf\n";
+        empty
       | Node (a_data, _, _), Leaf ->
-        let parent_data = a_data ^ a_data in
-        let parent = Node (parent_data, a, a) in
-        let Node (data, _, _) = List.hd next in
-        (* printf "1: (node, leaf) -> %S\n" data; *)
+        print_string "Node, Leaf\n";
+        let parent = Node (a_data ^ a_data, a, a) in
         if List.length rest = 0
         then aux ~tries:(tries-1) tree' (next @ [parent])
         else aux ~next:(next @ [parent]) tree' rest
 
       | Leaf, Node (b_data, _, _) ->
-        let parent_data = b_data ^ b_data in
-        let parent = Node (parent_data, b, b) in
-
+        print_string "Leaf, Node\n";
+        let parent = Node (b_data ^ b_data, b, b) in
         if List.length rest = 0
         then aux ~tries:(tries-1) tree' (next @ [parent])
         else aux ~next:(next @ [parent]) tree' rest
 
       | Node (a_data, _, _), Node (b_data, _, _) ->
-        let parent_data = a_data ^ b_data in
-        let parent = Node (parent_data, a, b) in
-
+        print_string "Node, Node\n";
+        let parent = Node (a_data ^ b_data, a, b) in
         if List.length rest = 0
         then aux ~tries:(tries-1) tree' (next @ [parent])
         else aux ~next:(next @ [parent]) tree' rest
