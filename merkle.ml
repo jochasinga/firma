@@ -29,27 +29,24 @@ let tree_of_txs txs =
   | x::xs ->
     let empty = Leaf
     and tries =
-      match nodes with
-      | [] -> 0
-      | [_] | [_; _] -> 1
-      | _ -> 2
-      in
-      (** TODO: Investigate why max tries is 2 to get correct behavior *)
-      (*
-      | x::xs -> (
-        if List.length nodes mod 2 = 0
-        then List.length nodes
-        else List.length nodes + 1 ) / 2 in
-      *)
-      printf "tries left: %d\n" tries;
+      (**
+       * 0 -> Merkle Root
+       * 1 -> End of intermediate level
+       * 2 -> Ongoing intermediate level
+       *)
 
+      (** TODO: Find a better way than tries, or at least come up with a better variable name. *)
+      match nodes with [] -> 0 | [_] | [_; _] -> 1 | _ -> 2
+  in
+  (* printf "Starting tries: %d\n" tries; *)
   let rec aux ?(tries=tries) ?(next=[]) tree' nodes' =
     match nodes' with
     | [] -> Leaf
     | [x] -> (
       (** Merkle root *)
-      if tries = 0 then x else
-      (** Widow node *)
+      if tries = 0 then (printf "last tries: %d\n" tries; x)
+      else
+      (** Handle a widow child transaction *)
         match x with
         | Leaf -> tree'
         | Node (x_data, _, _) ->
@@ -57,29 +54,25 @@ let tree_of_txs txs =
           let parent = Node (parent_data, x, x) in
           aux ~tries:(tries-1) tree' (next @ [parent])
       )
-    (** Ongoing *)
+    (** Ongoing ... *)
     | a :: b :: rest -> (
-      printf "tries: %d\n" tries;
+      (* printf "tries: %d\n" tries; *)
       match a, b with
-      | Leaf, Leaf ->
-        print_string "Leaf, Leaf\n";
-        empty
+      | Leaf, Leaf -> empty
       | Node (a_data, _, _), Leaf ->
-        print_string "Node, Leaf\n";
         let parent = Node (a_data ^ a_data, a, a) in
         if List.length rest = 0
         then aux ~tries:(tries-1) tree' (next @ [parent])
         else aux ~next:(next @ [parent]) tree' rest
 
       | Leaf, Node (b_data, _, _) ->
-        print_string "Leaf, Node\n";
         let parent = Node (b_data ^ b_data, b, b) in
         if List.length rest = 0
         then aux ~tries:(tries-1) tree' (next @ [parent])
         else aux ~next:(next @ [parent]) tree' rest
 
       | Node (a_data, _, _), Node (b_data, _, _) ->
-        print_string "Node, Node\n";
+        (* printf "Node %S, Node %S (tries: %d)\n" a_data b_data tries; *)
         let parent = Node (a_data ^ b_data, a, b) in
         if List.length rest = 0
         then aux ~tries:(tries-1) tree' (next @ [parent])
