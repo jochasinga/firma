@@ -1,5 +1,6 @@
 open Printf
 open Cryptokit
+open Yojson
 
 type payload = string * string
 type 'a tree =
@@ -31,6 +32,8 @@ let is_perfect_power_of a b =
 let is_perfect_power_of_two n = is_perfect_power_of n 2
 
 let is_one_lt_perfect_power_of_two n = is_perfect_power_of_two (n + 1)
+
+let hash_str_of_tx tx = hash_string (Hash.sha2 256) tx
 
 let node_of_tx tx = if String.length tx > 0 then Node (tx, Leaf, Leaf) else Leaf
 
@@ -135,6 +138,12 @@ let peek_right = function
   | Node (_, _, right) ->
     match right with Leaf -> () | Node(s, _, _) -> printf "%S\n" s
 
+let rec peek_tree = function
+  | Leaf ->  ()
+  | Node (h, left, right) ->
+    printf "%s\n" h;
+    peek_tree left; peek_tree right
+
 let peek_all: (string tree -> unit) = fun t ->
   let flattened = fringe t in
   let len = List.length flattened in
@@ -162,3 +171,35 @@ let peek_pair_all: (payload tree -> unit) = fun t ->
               aux xs (acc1 - 1) (acc2 + 1)
             end
   in aux flattened len 0
+
+let json_of_tree tree =
+  `Assoc [
+    ("data", (
+    let rec aux tree' =
+      match tree' with
+      | Leaf -> `Null
+      | Node (hash, left, right) -> `Assoc [
+          ("hash", `String hash);
+          ("left", aux left);
+          ("right", aux right);
+        ]
+    in aux tree ))
+  ] |> Basic.to_string
+
+  (** Example of JSON structure
+  `Assoc [
+      ("data", `Assoc [
+        ("hash", `String "ABCD");
+        ("left", `Assoc [
+          ("hash", `String "AB");
+          ("left", `Assoc [("hash", `String "A")]);
+          ("right", `Assoc [("hash", `String "B")])
+        ]);
+        ("right", `Assoc [
+          ("hash", `String "CD");
+          ("left", `Assoc [("hash", `String "C")]);
+          ("right", `Assoc [("hash", `String "D")])
+        ])
+      ])
+    ]
+  *)
