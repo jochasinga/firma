@@ -79,32 +79,32 @@ The JSON string being returned is
 ```json
 
 {
-  data: {
-    hash: "ABCD",
-    left: {
-      hash: "AB",
-      left: {
-        hash: "A",
-        left: null,
-        right: null
+  "data": {
+    "hash": "ABCD",
+    "left": {
+      "hash": "AB",
+      "left": {
+        "hash": "A",
+        "left": null,
+        "right": null
       },
-      right: {
-        hash: "B",
-        left: null,
-        right: null
+      "right": {
+        "hash": "B",
+        "left": null,
+        "right": null
       }
     },
-    right: {
-      hash: "CD",
-      left: {
-        hash: "C",
-        left: null,
-        right: null
+    "right": {
+      "hash": "CD",
+      "left": {
+        "hash": "C",
+        "left": null,
+        "right": null
       },
-      right: {
-        hash: "D",
-        left: null,
-        right: null
+      "right": {
+        "hash": "D",
+        "left": null,
+        "right": null
       }
     }
   }
