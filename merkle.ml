@@ -33,18 +33,21 @@ let is_perfect_power_of_two n = is_perfect_power_of n 2
 
 let is_one_lt_perfect_power_of_two n = is_perfect_power_of_two (n + 1)
 
-let hash_str_of_tx tx = hash_string (Hash.sha2 256) tx
+let hash_str_of_tx tx =
+  let transform = Hexa.encode () in
+  transform_string transform (hash_string (Hash.sha2 256) tx)
 
-let node_of_tx tx = if String.length tx > 0 then Node (tx, Leaf, Leaf) else Leaf
+let node_of_tx ?(debug = true) ?(left = Leaf) ?(right = Leaf) tx =
+  if String.length tx > 0 then Node ((if debug then tx else hash_str_of_tx tx), left, right) else Leaf
 
-let tree_of_txs txs =
+let tree_of_txs ?(debug = true) txs =
   if not (
     List.length txs |> is_perfect_power_of_two
     || List.length txs |> is_one_lt_perfect_power_of_two
     )
   then Leaf else
 
-  let nodes = List.map node_of_tx txs in
+  let nodes = List.map (node_of_tx ~debug:debug) txs in
   match nodes with
   | [] -> Leaf
   | [x] -> x
@@ -72,8 +75,9 @@ let tree_of_txs txs =
         match x with
         | Leaf -> tree'
         | Node (x_data, _, _) ->
-          let parent_data = x_data ^ x_data in
-          let parent = Node (parent_data, x, x) in
+          (* let parent_data = if debug then x_data ^ x_data else hash_str_of_tx (x_data ^ x_data) in *)
+          (* let parent = Node (parent_data, x, x) in *)
+          let parent = node_of_tx ~debug:debug ~left:x ~right:x (x_data ^ x_data) in
           aux ~tries:(tries-1) tree' (next @ [parent])
       )
     (** Ongoing ... *)
@@ -82,20 +86,23 @@ let tree_of_txs txs =
       match a, b with
       | Leaf, Leaf -> empty
       | Node (a_data, _, _), Leaf ->
-        let parent = Node (a_data ^ a_data, a, a) in
+        (* let parent = Node (a_data ^ a_data, a, a) in *)
+        let parent = node_of_tx ~debug:debug ~left:a ~right:a (a_data ^ a_data) in
         if List.length rest = 0
         then aux ~tries:(tries-1) tree' (next @ [parent])
         else aux ~next:(next @ [parent]) tree' rest
 
       | Leaf, Node (b_data, _, _) ->
-        let parent = Node (b_data ^ b_data, b, b) in
+        (* let parent = Node (b_data ^ b_data, b, b) in *)
+        let parent = node_of_tx ~debug:debug ~left:a ~right:b (b_data ^ b_data) in
         if List.length rest = 0
         then aux ~tries:(tries-1) tree' (next @ [parent])
         else aux ~next:(next @ [parent]) tree' rest
 
       | Node (a_data, _, _), Node (b_data, _, _) ->
         (* printf "Node %S, Node %S (tries: %d)\n" a_data b_data tries; *)
-        let parent = Node (a_data ^ b_data, a, b) in
+        (* let parent = Node (a_data ^ b_data, a, b) in *)
+        let parent = node_of_tx ~debug:debug ~left:a ~right:b (a_data ^ b_data) in
         if List.length rest = 0
         then aux ~tries:(tries-1) tree' (next @ [parent])
         else aux ~next:(next @ [parent]) tree' rest
@@ -203,3 +210,10 @@ let json_of_tree tree =
       ])
     ]
   *)
+
+module Tree = struct
+  type t = string tree
+  let of_tx = node_of_tx ~debug:false
+  let of_txs = tree_of_txs ~debug:false
+  let to_json = json_of_tree
+end

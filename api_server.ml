@@ -2,6 +2,7 @@ open Core
 open Async
 open Cohttp_async
 open Yojson
+open Merkle
 
 (* given filename: api_server.ml compile with:
    $ corebuild api_server.native -pkg cohttp.async,yojson,cryptokit
@@ -18,8 +19,10 @@ let handler ~body:_ _sock req =
   | "/merkle" ->
     Uri.get_query_param' uri "txs"
     |> Option.value ~default:[]
-    |> Merkle.tree_of_txs
-    |> Merkle.json_of_tree
+    (* |> Merkle.tree_of_txs *)
+    |> Tree.of_txs
+    (* |> Merkle.json_of_tree *)
+    |> Tree.to_json
     |> Server.respond_string
   | _ ->
     Server.respond_string ~status:`Not_found "Route not found"
