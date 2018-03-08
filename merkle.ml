@@ -185,11 +185,17 @@ let json_of_tree tree =
     let rec aux tree' =
       match tree' with
       | Leaf -> `Null
-      | Node (hash, left, right) -> `Assoc [
-          ("hash", `String hash);
-          ("left", aux left);
-          ("right", aux right);
-        ]
+      | Node (hash, left, right) ->
+        (
+        match aux left, aux right with
+        | `Null, `Null -> []
+        | `Null, right -> [right]
+        | left, `Null -> [left]
+        | left, right -> [left; right]
+        )
+        |> (fun children -> `Assoc [
+              ("hash", `String hash);
+              ("children", `List children)])
     in aux tree ))
   ] |> Basic.to_string
 
