@@ -29,6 +29,6 @@ val print_right_leaves : payload tree -> unit
 module Tree : sig
   type t
   val of_tx : ?left:t -> ?right:t -> string -> t
-  val of_txs : string list -> t
+  val of_txs : ?debug:bool -> string list -> t
   val to_json : t -> string
 end

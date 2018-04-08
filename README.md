@@ -71,7 +71,7 @@ Provided transactions `A`, `B`, `C`, and `D`:
 
 ```bash
 
-curl http://localhost:8080/merkle?txs=A,B,C,D
+curl http://localhost:8080/merkle?txs=A,B,C,D&debug=true
 
 ```
 The JSON string being returned is
@@ -81,36 +81,42 @@ The JSON string being returned is
 {
   "data": {
     "hash": "ABCD",
-    "left": {
-      "hash": "AB",
-      "left": {
-        "hash": "A",
-        "left": null,
-        "right": null
+    "children": [
+      {
+        "hash": "AB",
+        "children": [
+          {
+            "hash": "A",
+            "children": []
+          },
+          {
+            "hash": "B",
+            "children": []
+          }
+        ]
       },
-      "right": {
-        "hash": "B",
-        "left": null,
-        "right": null
+      {
+        "hash": "CD",
+        "children": [
+          {
+            "hash": "C",
+            "children": []
+          },
+          {
+            "hash": "D",
+            "children": []
+          }
+        ]
       }
-    },
-    "right": {
-      "hash": "CD",
-      "left": {
-        "hash": "C",
-        "left": null,
-        "right": null
-      },
-      "right": {
-        "hash": "D",
-        "left": null,
-        "right": null
-      }
-    }
+    ]
   }
 }
 
 ```
+Setting `debug` query parameter to anything other than `true` or leave empty
+will default to `debug=false` and hash strings are returned instead.
+
+JSON with `null` data will be returned if the number of `tx` is not a power of two.y
 
 Read [merkle.mli](./merkle.mli) to find out more.
 

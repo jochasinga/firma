@@ -16,12 +16,15 @@ let handler ~body:_ _sock req =
     |> Option.map ~f:(fun v -> "hello: " ^ v)
     |> Option.value ~default:"No param hello supplied"
     |> Server.respond_string
-  | "/merkle" ->
+  | "/merkle" ->    
     Uri.get_query_param' uri "txs"
     |> Option.value ~default:[]
-    (* |> Merkle.tree_of_txs *)
-    |> Tree.of_txs
-    (* |> Merkle.json_of_tree *)
+    |> ( let debug_param = Uri.get_query_param uri "debug" in
+         let debug_str   = Option.value ~default:"false" debug_param in
+         let debug       = match bool_of_string_opt debug_str with
+           | None -> false
+           | Some x -> x
+         in Tree.of_txs ~debug:debug )
     |> Tree.to_json
     |> Server.respond_string
   | _ ->

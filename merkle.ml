@@ -220,6 +220,6 @@ let json_of_tree tree =
 module Tree = struct
   type t = string tree
   let of_tx = node_of_tx ~debug:false
-  let of_txs = tree_of_txs ~debug:false
+  let of_txs = tree_of_txs
   let to_json = json_of_tree
 end
