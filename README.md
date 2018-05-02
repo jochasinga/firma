@@ -44,12 +44,21 @@ tree_of_txs ["A"; "B"; "C"; "D"] |> peek_all ;;
 
 ## Run JSON API server
 
-Find the root directory where `api_server.ml`is located, then
+Find the root directory where `api_server.ml`is located, then with [corebuild](https://github.com/janestreet/core):
 
 ```bash
 
 $ corebuild api_server.native -pkg cohttp.async,yojson,cryptokit
 $ ./api_server.native
+
+```
+
+or alternatively using [jbuild](https://github.com/ocaml/dune) is very simple:
+
+```bash
+
+$ jbuild build api_server.exe
+$ ./_build/default/api_server.exe
 
 ```
 

@@ -1,0 +1,12 @@
+(jbuild_version 1)
+
+;;
+;;(library
+;; (name        )
+;; (public_name )
+;; (synopsis "")
+;; (libraries ()))
+
+(executable
+ ((name api_server)
+  (libraries (core cohttp async cohttp.async cryptokit yojson))))
