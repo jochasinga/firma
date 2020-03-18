@@ -14,6 +14,7 @@ _build/
 # ocamlbuild targets
 *.byte
 *.native
+*.exe
 
 # oasis generated files
 setup.data
@@ -26,3 +27,5 @@ setup.log
 *#
 merkle
 node.ml
+
+dune-project

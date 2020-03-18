@@ -1,0 +1,8 @@
+(executable
+ (name      api_server)
+ (libraries core
+ 	    cohttp
+	    async
+	    cohttp.async
+	    cryptokit
+	    yojson))

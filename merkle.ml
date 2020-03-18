@@ -1,6 +1,6 @@
 open Printf
 open Cryptokit
-open Yojson
+(* open Yojson *)
 
 type payload = string * string
 type 'a tree =
@@ -51,16 +51,16 @@ let tree_of_txs ?(debug = true) txs =
   match nodes with
   | [] -> Leaf
   | [x] -> x
-  | x::xs ->
+  | _::_ ->
     let empty = Leaf
     and tries =
-      (**
+      (*
        * 0 -> Merkle Root
        * 1 -> End of intermediate level
        * 2 -> Ongoing intermediate level
        *)
 
-      (** TODO: Find a better way than tries, or at least come up with a better variable name. *)
+      (* TODO: Find a better way than tries, or at least come up with a better variable name. *)
       match nodes with [] -> 0 | [_] | [_; _] -> 1 | _ -> 2
   in
   (* printf "Starting tries: %d\n" tries; *)
@@ -68,10 +68,10 @@ let tree_of_txs ?(debug = true) txs =
     match nodes' with
     | [] -> Leaf
     | [x] -> (
-      (** Merkle root *)
+      (* Merkle root *)
       if tries = 0 then (printf "last tries: %d\n" tries; x)
       else
-      (** Handle a widow child transaction *)
+      (* Handle a widow child transaction *)
         match x with
         | Leaf -> tree'
         | Node (x_data, _, _) ->
@@ -80,7 +80,7 @@ let tree_of_txs ?(debug = true) txs =
           let parent = node_of_tx ~debug:debug ~left:x ~right:x (x_data ^ x_data) in
           aux ~tries:(tries-1) tree' (next @ [parent])
       )
-    (** Ongoing ... *)
+    (* Ongoing ... *)
     | a :: b :: rest -> (
       (* printf "tries: %d\n" tries; *)
       match a, b with
@@ -197,9 +197,9 @@ let json_of_tree tree =
               ("hash", `String hash);
               ("children", `List children)])
     in aux tree ))
-  ] |> Basic.to_string
+  ] |> Yojson.Basic.to_string
 
-  (** Example of JSON structure
+  (* Example of JSON structure
   `Assoc [
       ("data", `Assoc [
         ("hash", `String "ABCD");

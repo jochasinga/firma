@@ -1,7 +1,6 @@
 open Core
 open Async
 open Cohttp_async
-open Yojson
 open Merkle
 
 (* given filename: api_server.ml compile with:

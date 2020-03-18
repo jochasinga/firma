@@ -20,8 +20,7 @@ $ ocamlfind ocamlc -package cryptokit,yojson -c merkle.ml
 
 ```
 
-Instruction [here](http://projects.camlcity.org/projects/dl/findlib-1.2.6/doc/guide-html/quickstart.html) is awesome
-for linking libraries.
+Instruction [here](http://projects.camlcity.org/projects/dl/findlib-1.2.6/doc/guide-html/quickstart.html) is awesome for linking libraries.
 
 then load `merkle.cmo` on Ocaml's toplevel / utop:
 
@@ -44,20 +43,11 @@ tree_of_txs ["A"; "B"; "C"; "D"] |> peek_all ;;
 
 ## Run JSON API server
 
-Find the root directory where `api_server.ml`is located, then with [corebuild](https://github.com/janestreet/core):
+Find the root directory where `api_server.ml`is located, then run:
 
 ```bash
 
-$ corebuild api_server.native -pkg cohttp.async,yojson,cryptokit
-$ ./api_server.native
-
-```
-
-or alternatively using [jbuild](https://github.com/ocaml/dune) is very simple:
-
-```bash
-
-$ jbuild build api_server.exe
+$ dune build api_server.exe
 $ ./_build/default/api_server.exe
 
 ```
@@ -122,11 +112,11 @@ The JSON string being returned is
 }
 
 ```
+
 Setting `debug` query parameter to anything other than `true` or leave empty
 will default to `debug=false` and hash strings are returned instead.
 
-JSON with `null` data will be returned if the number of `tx` is not a power of two.y
-
+JSON with `null` data will be returned if the number of `tx` is not a power of two.
 Read [merkle.mli](./merkle.mli) to find out more.
 
 # WIP
