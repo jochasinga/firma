@@ -4,8 +4,8 @@ open Cohttp_async
 open Merkle
 
 (* given filename: api_server.ml compile with:
-   $ corebuild api_server.native -pkg cohttp.async,yojson,cryptokit
-*)
+ * $ dune build api_server.exe
+ *)
 
 let handler ~body:_ _sock req =
   let uri = Cohttp.Request.uri req in
