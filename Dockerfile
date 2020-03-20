@@ -1,4 +1,4 @@
-FROM ocaml/opam2:4.10
+FROM ocaml/opam2:4.08
 MAINTAINER Joe Chasinga "jo.chasinga@gmail.com"
 WORKDIR .
 
@@ -11,8 +11,11 @@ RUN sudo apt update -y && \
 	git \
 	m4 \
 	perl \
-        pkg-config \
-	libgmp-dev zlib1g-dev
+	pkg-config \
+        build-essential \
+	libgmp-dev \
+	zlib1g-dev \
+	libssl-dev \
         
 ADD . .
 RUN opam install -y -j 10 core dune cryptokit cohttp yojson async cohttp-async
