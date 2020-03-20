@@ -5,4 +5,6 @@
 	    async
 	    cohttp-async
 	    cryptokit
-	    yojson))
+	    yojson
+            alcotest
+            ounit2))
