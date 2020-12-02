@@ -1,6 +1,6 @@
-# annihilation
+# firma
 
-Implementation of a Merkle Hash Tree based on the [Bitcoin Whitepaper](https://bitcoin.org/bitcoin.pdf).
+Blockchain focusing on security token issuance and decentralized cap table.
 
 ## Testing on Ocaml's toplevel
 
